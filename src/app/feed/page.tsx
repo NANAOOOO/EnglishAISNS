@@ -8,7 +8,8 @@ export default async function Feed() {
     .order('created_at', { ascending: false })
     .limit(20);
 
-  const uid = cookies().get('sb-user-id')?.value;  
+    const cookieStore = await cookies();               
+    const uid = cookieStore.get('sb-user-id')?.value;  
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-4">
