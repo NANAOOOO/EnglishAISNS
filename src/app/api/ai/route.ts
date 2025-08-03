@@ -31,7 +31,16 @@ export async function POST(req: NextRequest) {
   });
 
 
-  const result = JSON.parse(chat.choices[0].message.content);
+  const raw = chat.choices[0].message.content;
+
+if (!raw) {
+  throw new Error('AI response is empty');
+}
+
+const result = JSON.parse(raw);  
+
+return NextResponse.json(result);
+
 
   return NextResponse.json(result);     
 }
