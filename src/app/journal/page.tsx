@@ -21,7 +21,7 @@ export default function JournalPage() {
         headers: { 'Content-Type': 'application/json' },
       });
       if (!res.ok) throw new Error('AI error');
-      
+
       const { corrected, translated, advice } = await res.json();
       const ai: AiResult = { corrected, translated, advice };
 
@@ -37,7 +37,7 @@ export default function JournalPage() {
       setPreview(ai);
       setMsg('✅ 保存しました');
       setText('');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       setMsg(`❌ ${err.message ?? 'エラー'}`);
     }
