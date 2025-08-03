@@ -39,7 +39,8 @@ export default function JournalPage() {
       setText('');
     } catch (err: unknown) {
       console.error(err);
-      setMsg(`❌ ${err.message ?? 'エラー'}`);
+      const msg = err instanceof Error ? err.message : 'unknown error';
+      setMsg(`❌ ${msg}`);
     }
   }
 
