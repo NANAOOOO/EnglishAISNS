@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
 
   const chat = await openai.chat.completions.create({
     model: process.env.GROQ_MODEL ?? 'gemma2-9b-it',
-    temperature: 0.1,
+    temperature: 0,
     messages: [
       {
         role: 'system',
@@ -30,17 +30,31 @@ export async function POST(req: NextRequest) {
     response_format: { type: 'json_object' },
   });
 
+  const raw = chat.choices[0].message.content ?? '{}';
 
-  const raw = chat.choices[0].message.content;
-
-if (!raw) {
-  throw new Error('AI response is empty');
-}
-
-const result = JSON.parse(raw);  
-
-return NextResponse.json(result);
-
-
-  return NextResponse.json(result);     
-}
+  let r: any;
+  try { r = JSON.parse(raw); } catch { r = {}; }
+  
+  // ① まず正規化
+  let corrected = (r.corrected ?? '').toString().trim() || text;
+  let translated = (r.translated ?? '').toString().trim();
+  let advice     = (r.advice ?? '').toString().trim();
+  
+  // ② 翻訳が空なら "翻訳専用" の2ndコールで必ず埋める（必要時のみ）
+  if (!translated) {
+    const t = await openai.chat.completions.create({
+      model: process.env.GROQ_TRANSLATION_MODEL
+              ?? process.env.GROQ_MODEL
+              ?? 'gemma2-9b-it',
+      temperature: 0,
+      messages: [
+        { role: 'system',
+          content: 'Translate the following English into natural Japanese. Return ONLY the translation text.' },
+        { role: 'user', content: corrected }
+      ]
+    });
+    translated = (t.choices[0].message.content ?? '').trim();
+  }
+  
+  return NextResponse.json({ corrected, translated, advice });
+  
