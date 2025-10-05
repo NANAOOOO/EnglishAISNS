@@ -21,25 +21,20 @@ export default function JournalPage() {
         headers: { 'Content-Type': 'application/json' },
       });
       if (!res.ok) throw new Error('AI error');
-      
-      const j = (await res.json()) as Partial<AiResult>;
-const ai: AiResult = {
-  corrected: j.corrected ?? '',
-  translated: j.translated ?? '',
-  advice: j.advice ?? '',
-};
 
-setPreview(ai); // 先にプレビュー表示
-
-const { error } = await supabase.from('post').insert({
-  original: text,
-  corrected: ai.corrected,
-  translated: ai.translated,
-  advice: ai.advice,
-});
-if (error) throw error;
+      const { corrected, translated, advice } = await res.json();
+      const ai: AiResult = { corrected, translated, advice };
 
 
+      const { error } = await supabase.from('post').insert({
+        original: text,
+        corrected,
+        translated,
+        advice: advice ?? '',
+      });
+      if (error) throw error;
+
+      setPreview(ai);
       setMsg('✅ 保存しました');
       setText('');
     } catch (err: unknown) {
