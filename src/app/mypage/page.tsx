@@ -2,7 +2,7 @@ import { getServerSupabase } from '@/lib/supabase-server';
 import { redirect } from 'next/navigation';
 
 export default async function MyPage() {
-  const supabase = await getServerSupabase();
+  const supabase = getServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
