@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
   const raw = chat.choices[0].message.content ?? '{}';
 
  let r: Partial<AiResponse> = {};
- try { r = JSON.parse(raw) as Partial<AiResponse>; } catch
+ try { r = JSON.parse(raw) as Partial<AiResponse>; } catch { /* noop */ }
   
   // ① まず正規化
   let corrected = (r.corrected ?? '').toString().trim() || text;
