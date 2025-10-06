@@ -2,6 +2,7 @@
 import { supabaseClient } from '@/lib/supabase-client';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { getBaseUrl } from '@/lib/base-url'; 
 
 export default function Login() {
   return (
