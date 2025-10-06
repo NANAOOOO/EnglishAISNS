@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+type ChatMessage = { role: 'user' | 'assistant' | 'system'; content: string };
+type AiRequest = { messages?: ChatMessage[]; text?: string };
+type AiResponse = { corrected: string; translated: string; advice: string };
+
 const openai = new OpenAI({
   apiKey:  process.env.OPENAI_API_KEY,
   baseURL: process.env.OPENAI_BASE_URL,
 });
 
 export async function POST(req: NextRequest) {
-  const { text } = await req.json();
+ const { text } = (await req.json()) as AiRequest;
+  if (!text || typeof text !== 'string') {
+    return NextResponse.json(
+      { error: 'Bad Request: body must include { text: string }' },
+      { status: 400 }
+    );
+  }
 
   const chat = await openai.chat.completions.create({
     model: process.env.GROQ_MODEL ?? 'gemma2-9b-it',
@@ -41,13 +51,13 @@ export async function POST(req: NextRequest) {
 
   const raw = chat.choices[0].message.content ?? '{}';
 
-  let r: any;
-  try { r = JSON.parse(raw); } catch { r = {}; }
+ let r: Partial<AiResponse> = {};
+ try { r = JSON.parse(raw) as Partial<AiResponse>; } catch
   
   // ① まず正規化
   let corrected = (r.corrected ?? '').toString().trim() || text;
   let translated = (r.translated ?? '').toString().trim();
-  let advice     = (r.advice ?? '').toString().trim();
+  const advice   = (r.advice ?? '').toString().trim();
 
   // 固有名の捏造対策 & 意味崩壊の簡易ガード
   if (/nana/i.test(corrected) && !/nana/i.test(text)) {
