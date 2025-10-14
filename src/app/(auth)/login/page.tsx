@@ -2,7 +2,6 @@
 import { supabaseClient } from '@/lib/supabase-client';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { getBaseUrl } from '@/lib/base-url'; 
 
 export default function Login() {
   return (
@@ -11,10 +10,9 @@ export default function Login() {
       <Auth
         supabaseClient={supabaseClient}
         appearance={{ theme: ThemeSupa }}
-        providers={[]}
+        providers={[]}          
         view="sign_in"
-        redirectTo={`${getBaseUrl()}/callback`}
-        magicLink
+        magicLink={false}
       />
     </div>
   );
