@@ -1,4 +1,3 @@
-// Server wrapper: 認証して userId を渡す
 import { redirect } from 'next/navigation';
 import { getServerSupabase } from '@/lib/supabase-server';
 import Client from './client';

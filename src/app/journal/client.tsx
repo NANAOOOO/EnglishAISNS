@@ -32,10 +32,8 @@ export default function Client({ userId }: { userId: string }) {
         advice: (j.advice ?? '').trim(),
       };
 
-      // 先にプレビュー
       setPreview(ai);
 
-      // DB 保存（認証付きクライアント）
       const { error } = await supabaseClient.from('post').insert({
         user_id: userId,
         original: text,
